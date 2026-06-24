@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import TerminalAbout from '../components/TerminalAbout';
 import {
   LayoutDashboard, FolderOpen, Briefcase, Shield,
   Terminal, Database, Cloud, Code2, ArrowRight,
@@ -472,6 +473,31 @@ export default function Home() {
             </div>
           </motion.div>
         </section>
+
+
+      {/* ══════════════ INTERACTIVE TERMINAL ABOUT ══════════════ */}
+      <section className="px-6 py-12 max-w-7xl mx-auto">
+        <motion.div 
+          initial="hidden" 
+          whileInView="visible" 
+          viewport={{ once: true, margin: '-80px' }} 
+          variants={stagger}
+        >
+          {/* Ye aapke naye design ka SectionHeader use karega */}
+          <motion.div variants={fadeUp}>
+            <SectionHeader eyebrow="System Profiler" title="Interactive" accent="Terminal." />
+            <p className="text-neutral-400 text-sm mb-10 max-w-2xl leading-relaxed">
+              Want to know more about my background? Access the secure terminal below and execute system commands to extract my professional records.
+            </p>
+          </motion.div>
+          
+          <motion.div variants={fadeUp}>
+            <TerminalAbout />
+          </motion.div>
+        </motion.div>
+      </section>
+
+   
 
         {/* ══════════════ TECH STACK BAR ══════════════ */}
         <section className="px-6 py-12 border-y border-neutral-900/60 bg-neutral-950/40">
