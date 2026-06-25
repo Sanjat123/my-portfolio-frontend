@@ -361,9 +361,21 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/projects/')
-      .then(r => { setProjects(r.data); setFilteredProjects(r.data); setLoading(false); })
+ useEffect(() => {
+    setLoading(true);
+    
+    // Automatic detection
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseUrl = isLocal 
+      ? 'http://127.0.0.1:8000/api' 
+      : 'https://my-portfolio-backend-2-ay2w.onrender.com/api';
+
+    axios.get(`${baseUrl}/projects/`)
+      .then(r => { 
+        setProjects(r.data); 
+        setFilteredProjects(r.data); 
+        setLoading(false); 
+      })
       .catch(() => setLoading(false));
   }, []);
 

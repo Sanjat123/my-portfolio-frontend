@@ -27,27 +27,27 @@ function AdminDashboard() {
   const config = { headers: { Authorization: `Token ${token}` } };
 
   // Fetch all data on mount
-  useEffect(() => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    fetchAllData();
-  }, [token]);
-
-  const fetchAllData = async () => {
+ const fetchAllData = async () => {
     setLoading(true);
+    
+    // Smart URL detection
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseUrl = isLocal 
+      ? 'http://127.0.0.1:8000/api' 
+      : 'https://my-portfolio-backend-2-ay2w.onrender.com/api';
+
     try {
       const [statsRes, projectsRes, messagesRes] = await Promise.all([
-        axios.get('http://127.0.0.1:8000/api/stats/', config),
-        axios.get('http://127.0.0.1:8000/api/projects/', config),
-        axios.get('http://127.0.0.1:8000/api/messages/', config)
+        axios.get(`${baseUrl}/stats/`, config),
+        axios.get(`${baseUrl}/projects/`, config),
+        axios.get(`${baseUrl}/messages/`, config)
       ]);
+      
       setStats(statsRes.data);
       setProjects(projectsRes.data);
       setMessages(messagesRes.data);
     } catch (error) {
-      console.error("Error fetching data", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }

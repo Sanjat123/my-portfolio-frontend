@@ -76,12 +76,24 @@ export default function ProjectDetail() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
+  
   useEffect(() => {
     window.scrollTo(0, 0);
-    axios.get(`http://127.0.0.1:8000/api/projects/${slug}/`)
-      .then(r => { setProject(r.data); setLoading(false); })
+    setLoading(true);
+
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseUrl = isLocal 
+      ? 'http://127.0.0.1:8000/api' 
+      : 'https://my-portfolio-backend-2-ay2w.onrender.com/api';
+
+    axios.get(`${baseUrl}/projects/${slug}/`)
+      .then(r => {
+        setProject(r.data);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
-    axios.post(`http://127.0.0.1:8000/api/projects/${slug}/add_view/`).catch(() => {});
+
+    axios.post(`${baseUrl}/projects/${slug}/add_view/`).catch(() => {});
   }, [slug]);
 
   const copyLink = () => {
