@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Shield, Eye, Calendar, Terminal, ExternalLink,
   GitBranch, Copy, CheckCircle, Code2, Zap, Lock,
   ChevronRight, Star, Clock, Globe, ArrowRight
 } from 'lucide-react';
+
+// 🔥 YAHAN SE HUM LOCAL DATA IMPORT KAR RAHE HAIN 🔥
+import { PROJECTS_DATA } from './Home';
 
 function NoiseOverlay() {
   return (
@@ -23,12 +25,14 @@ function NoiseOverlay() {
 function GlowCard({ children, className = '' }) {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [hover, setHover] = useState(false);
-  const ref = React.useRef();
+  const cardRef = useRef(null);
+
   return (
     <div
-      ref={ref}
+      ref={cardRef}
       onMouseMove={(e) => {
-        const rect = ref.current.getBoundingClientRect();
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
         setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
       }}
       onMouseEnter={() => setHover(true)}
@@ -76,24 +80,17 @@ export default function ProjectDetail() {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
-  
   useEffect(() => {
     window.scrollTo(0, 0);
     setLoading(true);
 
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const baseUrl = isLocal 
-      ? 'http://127.0.0.1:8000/api' 
-      : 'https://my-portfolio-backend-2-ay2w.onrender.com/api';
+    // 🚀 NO AXIOS! NO BACKEND! Seedha local data se project fetch kar rahe hain
+    setTimeout(() => {
+      const foundProject = PROJECTS_DATA.find(p => p.slug === slug);
+      setProject(foundProject || null);
+      setLoading(false);
+    }, 400); // 400ms ka fake delay taaki skeleton animation dikhe
 
-    axios.get(`${baseUrl}/projects/${slug}/`)
-      .then(r => {
-        setProject(r.data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-
-    axios.post(`${baseUrl}/projects/${slug}/add_view/`).catch(() => {});
   }, [slug]);
 
   const copyLink = () => {
@@ -194,8 +191,8 @@ export default function ProjectDetail() {
 
             <div className="flex flex-wrap gap-3">
               {[
-                { icon: Eye, text: `${(project.views_count || 0) + 1} views` },
-                { icon: Calendar, text: new Date(project.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) },
+                { icon: Eye, text: `${(project.views_count || 0)} views` },
+                { icon: Calendar, text: project.created_at ? new Date(project.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '2026' },
                 project.duration ? { icon: Clock, text: project.duration } : null,
                 techStack.length ? { icon: Code2, text: `${techStack.length} technologies` } : null,
               ].filter(Boolean).map(({ icon: Icon, text }) => (
@@ -265,10 +262,10 @@ export default function ProjectDetail() {
                         <Zap size={13} className="text-red-500" /> Quick Stats
                       </h3>
                       {[
-                        { label: 'Views', value: (project.views_count || 0) + 1 },
+                        { label: 'Views', value: (project.views_count || 0) },
                         { label: 'Status', value: project.status || 'Production' },
                         { label: 'Type', value: project.project_type || 'Full-Stack' },
-                        { label: 'Year', value: new Date(project.created_at).getFullYear() },
+                        { label: 'Year', value: project.created_at ? new Date(project.created_at).getFullYear() : '2026' },
                       ].map(({ label, value }) => (
                         <div key={label} className="flex items-center justify-between py-2 border-b border-neutral-900 last:border-0">
                           <span className="text-neutral-600 text-xs uppercase tracking-wider font-bold">{label}</span>
@@ -375,11 +372,11 @@ export default function ProjectDetail() {
                     {[
                       { label: 'Project ID', value: project.id || 'N/A', mono: true },
                       { label: 'Slug', value: slug, mono: true },
-                      { label: 'Views', value: (project.views_count || 0) + 1 },
+                      { label: 'Views', value: (project.views_count || 0) },
                       { label: 'Featured', value: project.is_featured ? 'Yes' : 'No' },
                       { label: 'Status', value: project.status || 'Active' },
                       { label: 'Type', value: project.project_type || 'Full-Stack App' },
-                      { label: 'Created', value: new Date(project.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) },
+                      { label: 'Created', value: project.created_at ? new Date(project.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A' },
                       { label: 'Tech Count', value: `${techStack.length} technologies` },
                     ].map(({ label, value, mono }) => (
                       <div key={label} className="flex items-center justify-between py-3 px-4 rounded-xl bg-neutral-900 border border-neutral-800">

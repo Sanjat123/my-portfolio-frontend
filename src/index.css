@@ -2,12 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #050505; /* Deep Vault Black */
-  color: #f8fafc;
-  font-family: 'Inter', system-ui, sans-serif;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    /* Ab body light mode mein bright aur dark mode mein black hogi */
+    @apply bg-neutral-50 text-neutral-800 dark:bg-[#050505] dark:text-[#f8fafc] font-sans antialiased min-h-screen transition-colors duration-300;
+  }
 }
 
 .glass-panel {
